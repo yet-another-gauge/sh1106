@@ -17,20 +17,13 @@
  * along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <sh1106.h>
-
-#define SH1106_SET_LOWER_COLUMN_ADDRESS(addr) (0b00000000 | (0b00001111 & (addr)))
-#define SH1106_SET_HIGHER_COLUMN_ADDRESS(addr) (0b00010000 | (addr >> 4))
+#include "sh1106.h"
+#include "syscfg.h"
 
 void sh1106_set_column_address(t_send8 send8, uint8_t addr) {
   (*send8)(SH1106_SET_LOWER_COLUMN_ADDRESS(addr));
   (*send8)(SH1106_SET_HIGHER_COLUMN_ADDRESS(addr));
 }
-
-#define SH1106_SET_PUMP_VOLTAGE_7_4 0b00110000
-#define SH1106_SET_PUMP_VOLTAGE_8_0 0b00110001
-#define SH1106_SET_PUMP_VOLTAGE_8_4 0b00110010
-#define SH1106_SET_PUMP_VOLTAGE_9_0 0b00110011
 
 void sh1106_set_pump_voltage(t_send8 send8, enum sh1106_pump_voltage pump_voltage) {
   switch (pump_voltage) {
@@ -53,131 +46,104 @@ void sh1106_set_pump_voltage(t_send8 send8, enum sh1106_pump_voltage pump_voltag
   }
 }
 
-#define SH1106_SET_DISPLAY_START_LINE(addr) (0b01000000 | (0b00111111 & (addr)))
-
 void sh1106_set_display_start_line(t_send8 send8, uint8_t addr) {
   (*send8)(SH1106_SET_DISPLAY_START_LINE(addr));
 }
 
-#define SH1106_CONTRAST_CONTROL_MODE_SET 0b10000001
-
 void sh1106_set_contrast_control_register(t_send8 send8, uint8_t contrast) {
   (*send8)(SH1106_CONTRAST_CONTROL_MODE_SET);
-  (*send8)(contrast);
+  (*send8)(SH1106_CONTRAST_DATA_REGISTER_SET(contrast));
 }
 
-#define SH1106_SET_SEGMENT_RE_MAP(direction) (0b10100000 | (0b00000001 & (direction)))
-
-void sh1106_set_segment_re_map(t_send8 send8, enum sh1106_segment_direction segment_direction) {
-  switch (segment_direction) {
-    case SH1106_SEGMENT_NORMAL_DIRECTION: {
-      (*send8)(SH1106_SET_SEGMENT_RE_MAP(0));
+void sh1106_set_segment_re_map(t_send8 send8, enum sh1106_segment_re_map_direction segment_re_map_direction) {
+  switch (segment_re_map_direction) {
+    case SH1106_SEGMENT_RE_MAP_NORMAL_DIRECTION: {
+      (*send8)(SH1106_SET_SEGMENT_RE_MAP_NORMAL_DIRECTION);
       break;
     }
-    case SH1106_SEGMENT_REVERSE_DIRECTION: {
-      (*send8)(SH1106_SET_SEGMENT_RE_MAP(1));
+    case SH1106_SEGMENT_RE_MAP_REVERSE_DIRECTION: {
+      (*send8)(SH1106_SET_SEGMENT_RE_MAP_REVERSE_DIRECTION);
       break;
     }
   }
 }
-
-#define SH1106_SET_ENTIRE_DISPLAY(state) (0b10100100 | (0b00000001 & (state)))
-#define SH1106_SET_DISPLAY_OLED(state) (0b10101110 | (0b00000001 & (state)))
 
 void sh1106_set_display_state(t_send8 send8, enum sh1106_display_state display_state) {
   switch (display_state) {
     case SH1106_INTERNAL_ON: {
-      (*send8)(SH1106_SET_ENTIRE_DISPLAY(1));
+      (*send8)(SH1106_SET_ENTIRE_DISPLAY_ON);
       break;
     }
     case SH1106_INTERNAL_OFF: {
-      (*send8)(SH1106_SET_ENTIRE_DISPLAY(0));
+      (*send8)(SH1106_SET_ENTIRE_DISPLAY_OFF);
       break;
     }
     case SH1106_OLED_ON: {
-      (*send8)(SH1106_SET_DISPLAY_OLED(1));
+      (*send8)(SH1106_DISPLAY_ON_OLED);
       break;
     }
     case SH1106_OLED_OFF: {
-      (*send8)(SH1106_SET_DISPLAY_OLED(0));
+      (*send8)(SH1106_DISPLAY_OFF_OLED);
       break;
     }
   }
 }
-
-#define SH1106_SET_DISPLAY_DIRECTION(direction) (0b10100110 | (0b00000001 & (direction)))
 
 void sh1106_set_display_direction(t_send8 send8, enum sh1106_display_direction display_direction) {
   switch (display_direction) {
     case SH1106_DISPLAY_NORMAL_DIRECTION: {
-      (*send8)(SH1106_SET_DISPLAY_DIRECTION(0));
+      (*send8)(SH1106_SET_NORMAL_DISPLAY_DIRECTION);
       break;
     }
     case SH1106_DISPLAY_REVERSE_DIRECTION: {
-      (*send8)(SH1106_SET_DISPLAY_DIRECTION(1));
+      (*send8)(SH1106_SET_REVERSE_DISPLAY_DIRECTION);
       break;
     }
   }
 }
-
-#define SH1106_MULTIPLE_RATION_MODE_SET 0b10101000
-#define SH1106_MULTIPLEX_RATION_DATA_SET(data) (0b00111111 & (data))
 
 void sh1106_set_multiplex_ration(t_send8 send8, uint8_t multiplex_ratio) {
   (*send8)(SH1106_MULTIPLE_RATION_MODE_SET);
   (*send8)(SH1106_MULTIPLEX_RATION_DATA_SET(multiplex_ratio));
 }
 
-#define SH1106_DC_DC_CONTROL_MODE_SET 0b10101101
-#define SH1106_DC_DC_MODE_SET(mode) (0b10001010 | (0b00000001 & (mode)))
-
 void sh1106_set_dc_dc_mode(t_send8 send8, enum sh1106_dc_dc_mode dc_dc_mode) {
   switch (dc_dc_mode) {
     case SH1106_DC_DC_DISABLE: {
       (*send8)(SH1106_DC_DC_CONTROL_MODE_SET);
-      (*send8)(SH1106_DC_DC_MODE_SET(0));
+      (*send8)(SH1106_DC_DC_OFF_MODE_SET);
       break;
     }
     case SH1106_DC_DC_ENABLE: {
       (*send8)(SH1106_DC_DC_CONTROL_MODE_SET);
-      (*send8)(SH1106_DC_DC_MODE_SET(1));
+      (*send8)(SH1106_DC_DC_ON_MODE_SET);
       break;
     }
   }
 }
-
-#define SH1106_SET_PAGE_ADDRESS(addr) (0b10110000 | (0b00001111 & (addr)))
 
 void sh1106_set_page_address(t_send8 send8, uint8_t page_addr) {
   (*send8)(SH1106_SET_PAGE_ADDRESS(page_addr));
 }
 
-#define SH1106_SET_COMMON_OUTPUT_SCAN_DIRECTION(direction) (0b11000000 | (0b00001000 & (direction)))
-
 void sh1106_set_common_output_scan_direction(t_send8 send8,
                                              enum sh1106_common_output_scan_direction common_output_scan_direction) {
   switch (common_output_scan_direction) {
     case SH1106_COMMON_OUTPUT_SCAN_NORMAL_DIRECTION: {
-      (*send8)(SH1106_SET_COMMON_OUTPUT_SCAN_DIRECTION(0b00000000));
+      (*send8)(SH1106_SET_COMMON_OUTPUT_SCAN_DIRECTION_FROM_COM0_TO_COMN);
       break;
     }
-    case SH1106_COMMON_OUTPUT_SCAM_VERTICALLY_FLIPPED: {
-      (*send8)(SH1106_SET_COMMON_OUTPUT_SCAN_DIRECTION(0b00001000));
+    case SH1106_COMMON_OUTPUT_SCAN_DIRECTION_VERTICALLY_FLIPPED: {
+      (*send8)(SH1106_SET_COMMON_OUTPUT_SCAN_DIRECTION_FROM_COMN_TO_COM0);
       break;
     }
   }
 }
 
-#define SH1106_DISPLAY_OFFSET_MODE_SET 0b11010011
-#define SH1106_DISPLAY_OFFSET_DATA_SET(offset) (0b00000000 | (0b00111111 & (offset)))
-
 void sh1106_set_display_offset(t_send8 send8, uint8_t display_offset) {
   (*send8)(SH1106_DISPLAY_OFFSET_MODE_SET);
   (*send8)(SH1106_DISPLAY_OFFSET_DATA_SET(display_offset));
 }
-
-#define SH1106_DIVIDE_RATIO_OSCILLATOR_FREQUENCY_MODE_SET 0b11010101
-#define SH1106_DIVIDE_RATIO_OSCILLATOR_FREQUENCY_DATA_SET(ration, freq) ((0b11110000 & ((freq) << 4)) | (0b00001111 & (ration - 1)))
 
 void sh1106_set_display_clock_divide_ratio_oscillator_frequency(t_send8 send8,
                                                                 uint8_t clock_divide_ration,
@@ -251,17 +217,10 @@ void sh1106_set_display_clock_divide_ratio_oscillator_frequency(t_send8 send8,
   }
 }
 
-#define SH1106_PRE_CHARGE_PERIOD_MODE_SET 0b11011001
-#define SH1106_DIS_CHARGE_PRE_CHARGE_PERIOD_DATA_SET(pre, dis) ((0b11110000 & ((dis) << 4)) | (0b00001111 & (pre)))
-
 void sh1106_set_dis_charge_pre_charge_period(t_send8 send8, uint8_t pre_charge_period, uint8_t dis_charge_period) {
   (*send8)(SH1106_PRE_CHARGE_PERIOD_MODE_SET);
   (*send8)(SH1106_DIS_CHARGE_PRE_CHARGE_PERIOD_DATA_SET(pre_charge_period, dis_charge_period));
 }
-
-#define SH1106_COMMON_PADS_HARDWARE_CONFIGURATION_MODE_SET 0b11011010
-#define SH1106_SEQUENTIAL_MODE_SET 0b00000010
-#define SH1106_ALTERNATIVE_MODE_SET 0b00010010
 
 void sh1106_set_common_pads_hardware_configuration(t_send8 send8,
                                                    enum sh1106_common_signals_pad_configuration common_signals_pad_configuration) {
@@ -279,31 +238,23 @@ void sh1106_set_common_pads_hardware_configuration(t_send8 send8,
   }
 }
 
-#define SH1106_VCOM_DESELECT_LEVEL_MODE_SET 0b11011011
-
 void sh1106_set_vcom_deselect_level(t_send8 send8, uint8_t deselect_level) {
   (*send8)(SH1106_VCOM_DESELECT_LEVEL_MODE_SET);
-  (*send8)(deselect_level);
+  (*send8)(SH1106_VCOM_DESELECT_LEVEL_DATA_SET(deselect_level));
 }
-
-#define SH1106_READ_MODIFY_WRITE 0b11100000
 
 void sh1106_read_modify_write(t_send8 send8) {
   (*send8)(SH1106_READ_MODIFY_WRITE);
 }
 
-#define SH1106_END 0b11101110
-
 void sh1106_end(t_send8 send8) {
   (*send8)(SH1106_END);
 }
-
-#define SH1106_NOP 0b11100011
 
 void sh1106_nop(t_send8 send8) {
   (*send8)(SH1106_NOP);
 }
 
 void sh1106_write_display_data(t_send8 send8, uint8_t data) {
-  (*send8)(data);
+  (*send8)(SH1106_WRITE_DISPLAY_DATA(data));
 }
