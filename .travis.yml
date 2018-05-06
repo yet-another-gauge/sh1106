@@ -1,0 +1,17 @@
+language: c
+
+matrix:
+  include:
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - cmake
+
+script:
+  - mkdir cmake-build
+  - cd cmake-build
+  - cmake ../
+  - make
