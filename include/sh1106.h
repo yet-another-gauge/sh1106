@@ -25,9 +25,16 @@
 /**
  * @brief TODO
  *
- * @param[in] data 8 bit data to written
+ * @param[in] cmd 8 bit command to be sent
  */
-typedef void (*t_send8)(uint8_t data);
+typedef void (*sh1106_send8_cmd_t)(uint8_t cmd);
+
+/**
+ * @brief TODO
+ *
+ * @param[in] data 8 bit data to be sent
+ */
+typedef void (*sh1106_send8_data_t)(uint8_t data);
 
 /**
  * @brief Set column address.
@@ -36,10 +43,10 @@ typedef void (*t_send8)(uint8_t data);
  * address counter is incremented during each access until address 132 is accessed. The page address is not changed
  * during this time.
  *
- * @param[in] send8 TODO
+ * @param[in] send8_cmd TODO
  * @param[in] column_addr TODO
  */
-void sh1106_set_column_address(t_send8 send8, uint8_t column_addr);
+void sh1106_set_column_address(const sh1106_send8_cmd_t send8_cmd, uint8_t column_addr);
 
 /**
  * @brief TODO
@@ -60,10 +67,10 @@ enum sh1106_pump_voltage {
  *
  * Specifies output voltage (Vpp) of the internal charger pump.
  *
- * @param[in] send8 TODO
+ * @param[in] send8_cmd TODO
  * @param[in] pump_voltage TODO
  */
-void sh1106_set_pump_voltage(t_send8 send8, enum sh1106_pump_voltage pump_voltage);
+void sh1106_set_pump_voltage(const sh1106_send8_cmd_t send8_cmd, enum sh1106_pump_voltage pump_voltage);
 
 /**
  * @brief Set display start line.
@@ -72,26 +79,22 @@ void sh1106_set_pump_voltage(t_send8 send8, enum sh1106_pump_voltage pump_voltag
  * OLED screen. It is followed by the higher number of lines in ascending order, corresponding to the duty cycle. When
  * this command changes the line address, the smooth scrolling or page change takes place.
  *
- * @param[in] send8 TODO
+ * @param[in] send8_cmd TODO
  * @param[in] line_addr TODO
  */
-void sh1106_set_display_start_line(t_send8 send8, uint8_t line_addr);
+void sh1106_set_display_start_line(const sh1106_send8_cmd_t send8_cmd, uint8_t line_addr);
 
 /**
  * @brief Set contrast control register.
  *
  * This command is to set contrast setting of the display. The chip has 256 contrast steps from 0x00 to 0xFF. The
  * segment output current increases as the contrast step value increases. Segment output current setting:
- *      ISEG = α / 256 * IREF * scale factor
- * Where:
- *      α is contrast step;
- *      IREF is reference current equals 10μA;
- *      Scale factor = 32.
+ *      ISEG = contrast_step / 256 * IREF * scale_factor = contrast_step / 256 * 10 * 32
  *
- * @param[in] send8 TODO
- * @param[in] contrast TODO
+ * @param[in] send8_cmd TODO
+ * @param[in] contrast_step TODO
  */
-void sh1106_set_contrast_control_register(t_send8 send8, uint8_t contrast);
+void sh1106_set_contrast_control_register(const sh1106_send8_cmd_t send8_cmd, uint8_t contrast_step);
 
 /**
  * @brief TODO
@@ -110,10 +113,11 @@ enum sh1106_segment_re_map_direction {
  * be reversed by software. This allows flexible IC layout during OLED module assembly. When display data is written or
  * read, the column address is incremented by 1.
  *
- * @param[in] send8 TODO
+ * @param[in] send8_cmd TODO
  * @param[in] segment_re_map_direction TODO
  */
-void sh1106_set_segment_re_map(t_send8 send8, enum sh1106_segment_re_map_direction segment_re_map_direction);
+void sh1106_set_segment_re_map(const sh1106_send8_cmd_t send8_cmd,
+                               enum sh1106_segment_re_map_direction segment_re_map_direction);
 
 /**
  * @brief TODO
@@ -150,10 +154,10 @@ enum sh1106_display_state {
  *              3. Holds the display data and operation mode provided before the start of the sleep mode.
  *              4. The MPU can access to the built-in display RAM.
  *
- * @param[in] send8 TODO
+ * @param[in] send8_cmd TODO
  * @param[in] display_state TODO
  */
-void sh1106_set_display_state(t_send8 send8, enum sh1106_display_state display_state);
+void sh1106_set_display_state(const sh1106_send8_cmd_t send8_cmd, enum sh1106_display_state display_state);
 
 enum sh1106_display_direction {
   /** The RAM data is high, being OLED ON potential (normal display) (POR) */
@@ -167,10 +171,10 @@ enum sh1106_display_direction {
  *
  * Reverses the display ON/OFF status without rewriting the contents of the display data RAM.
  *
- * @param[in] send8 TODO
+ * @param[in] send8_cmd TODO
  * @param[in] display_direction TODO
  */
-void sh1106_set_display_direction(t_send8 send8, enum sh1106_display_direction display_direction);
+void sh1106_set_display_direction(const sh1106_send8_cmd_t send8_cmd, enum sh1106_display_direction display_direction);
 
 /**
  * @brief Set multiplex ration.
@@ -178,10 +182,10 @@ void sh1106_set_display_direction(t_send8 send8, enum sh1106_display_direction d
  * This command switches default 64 multiplex modes to any multiplex ratio from 1 to 64. The output pads COM0-COM63
  * will be switched to corresponding common signal.
  *
- * @param[in] send8 TODO
+ * @param[in] send8_cmd TODO
  * @param[in] multiplex_ratio TODO
  */
-void sh1106_set_multiplex_ration(t_send8 send8, uint8_t multiplex_ratio);
+void sh1106_set_multiplex_ration(const sh1106_send8_cmd_t send8_cmd, uint8_t multiplex_ratio);
 
 /**
  * @brief TODO
@@ -212,10 +216,10 @@ enum sh1106_dc_dc_mode {
  * |              |                       |            Normal Display |
  * +--------------+-----------------------+---------------------------+
  *
- * @param[in] send8 TODO
+ * @param[in] send8_cmd TODO
  * @param[in] dc_dc_mode TODO
  */
-void sh1106_set_dc_dc_mode(t_send8 send8, enum sh1106_dc_dc_mode dc_dc_mode);
+void sh1106_set_dc_dc_mode(const sh1106_send8_cmd_t send8_cmd, enum sh1106_dc_dc_mode dc_dc_mode);
 
 /**
  * @brief Set page address.
@@ -223,10 +227,10 @@ void sh1106_set_dc_dc_mode(t_send8 send8, enum sh1106_dc_dc_mode dc_dc_mode);
  * Specifies page address to load display RAM data to page address register. Any RAM data bit can be accessed when its
  * page address and column address are specified. The display remains unchanged even when the page address is changed.
  *
- * @param[in] send8 TODO
+ * @param[in] send8_cmd TODO
  * @param[in] page_addr TODO
  */
-void sh1106_set_page_address(t_send8 send8, uint8_t page_addr);
+void sh1106_set_page_address(const sh1106_send8_cmd_t send8_cmd, uint8_t page_addr);
 
 /**
  * @brief TODO
@@ -245,10 +249,10 @@ enum sh1106_common_output_scan_direction {
  * addition, the display will have immediate effect once this command is issued. That is, if this command is sent
  * during normal display, the graphic display will be vertically flipped.
  *
- * @param[in] send8 TODO
+ * @param[in] send8_cmd TODO
  * @param[in] common_output_scan_direction TODO
  */
-void sh1106_set_common_output_scan_direction(t_send8 send8,
+void sh1106_set_common_output_scan_direction(const sh1106_send8_cmd_t send8_cmd,
                                              enum sh1106_common_output_scan_direction common_output_scan_direction);
 
 /**
@@ -259,10 +263,10 @@ void sh1106_set_common_output_scan_direction(t_send8 send8,
  * data in the second byte should be given by 0b010000. To move in the opposite direction by 16 lines, the 6-bit data
  * should be given by (64-16), so the second byte should be 0b100000.
  *
- * @param[in] send8 TODO
+ * @param[in] send8_cmd TODO
  * @param[in] display_offset TODO
  */
-void sh1106_set_display_offset(t_send8 send8, uint8_t display_offset);
+void sh1106_set_display_offset(const sh1106_send8_cmd_t send8_cmd, uint8_t display_offset);
 
 /**
  * @brief TODO
@@ -309,11 +313,11 @@ enum sh1106_oscillator_frequency {
  * (value from 1 to 16) used to divide the oscillator frequency. POR is 1. Frame frequency is determined by divide
  * ratio, number of display clocks per row, MUX ratio and oscillator frequency.
  *
- * @param[in] send8 TODO
+ * @param[in] send8_cmd TODO
  * @param[in] clock_divide_ration TODO
  * @param[in] oscillator_frequency TODO
  */
-void sh1106_set_display_clock_divide_ratio_oscillator_frequency(t_send8 send8,
+void sh1106_set_display_clock_divide_ratio_oscillator_frequency(const sh1106_send8_cmd_t send8_cmd,
                                                                 uint8_t clock_divide_ration,
                                                                 enum sh1106_oscillator_frequency oscillator_frequency);
 
@@ -323,11 +327,13 @@ void sh1106_set_display_clock_divide_ratio_oscillator_frequency(t_send8 send8,
  * This command is used to set the duration of the pre-charge period. The interval is counted in number of DCLK.
  * POR is 2 DCLKs.
  *
- * @param[in] send8 TODO
+ * @param[in] send8_cmd TODO
  * @param[in] pre_charge_period TODO
  * @param[in] dis_charge_period TODO
  */
-void sh1106_set_dis_charge_pre_charge_period(t_send8 send8, uint8_t pre_charge_period, uint8_t dis_charge_period);
+void sh1106_set_dis_charge_pre_charge_period(const sh1106_send8_cmd_t send8_cmd,
+                                             uint8_t pre_charge_period,
+                                             uint8_t dis_charge_period);
 
 /**
  * @brief TODO
@@ -363,10 +369,10 @@ enum sh1106_common_signals_pad_configuration {
  *      | COM62,60 - 2,0 | SEG0,1 - 130,131 |   COM1,3 - 61,63 |
  *      +----------------+------------------+------------------+
  *
- * @param[in] send8 TODO
+ * @param[in] send8_cmd TODO
  * @param[in] common_signals_pad_configuration TODO
  */
-void sh1106_set_common_pads_hardware_configuration(t_send8 send8,
+void sh1106_set_common_pads_hardware_configuration(const sh1106_send8_cmd_t send8_cmd,
                                                    enum sh1106_common_signals_pad_configuration common_signals_pad_configuration);
 
 /**
@@ -414,10 +420,10 @@ void sh1106_set_common_pads_hardware_configuration(t_send8 send8,
  *      | 40H - FFH |     1 |           |             |
  *      +-----------+-------+-----------+-------------+
  *
- * @param[in] send8 TODO
+ * @param[in] send8_cmd TODO
  * @param[in] deselect_level TODO
  */
-void sh1106_set_vcom_deselect_level(t_send8 send8, uint8_t deselect_level);
+void sh1106_set_vcom_deselect_level(const sh1106_send8_cmd_t send8_cmd, uint8_t deselect_level);
 
 /**
  * @brief Read-Modify-Write.
@@ -477,9 +483,9 @@ void sh1106_set_vcom_deselect_level(t_send8 send8, uint8_t deselect_level);
  *                       +--------------->+
  *                       |
  *
- * @param[in] send8 TODO
+ * @param[in] send8_cmd TODO
  */
-void sh1106_read_modify_write(t_send8 send8);
+void sh1106_read_modify_write(const sh1106_send8_cmd_t send8_cmd);
 
 /**
  * @brief End.
@@ -495,18 +501,18 @@ void sh1106_read_modify_write(t_send8 send8);
  *                      +----- Read-Modify-Write                              +----- End
  *                             mode is selected
  *
- * @param[in] send8 TODO
+ * @param[in] send8_cmd TODO
  */
-void sh1106_end(t_send8 send8);
+void sh1106_end(const sh1106_send8_cmd_t send8_cmd);
 
 /**
  * @brief NOP.
  *
  * Non-Operation Command.
  *
- * @param[in] send8 TODO
+ * @param[in] send8_cmd TODO
  */
-void sh1106_nop(t_send8 send8);
+void sh1106_nop(const sh1106_send8_cmd_t send8_cmd);
 
 /**
  * @brief Write Display Data.
@@ -514,16 +520,10 @@ void sh1106_nop(t_send8 send8);
  * Write 8-bit data in display RAM. As the column address is incremental by 1 automatically after each write, the
  * microprocessor can continue to write data of multiple words.
  *
- * +----+----+----+   +----+----+----+----+----+----+----+----+
- * | A0 | RD | WR |   | D7 | D6 | D5 | D4 | D3 | D2 | D1 | D0 |
- * +----+----+----+   +----+----+----+----+----+----+----+----+
- * |  1 |  1 |  0 |   |                        Write RAM data |
- * +----+----+----+   +----+----+----+----+----+----+----+----+
- *
- * @param[in] send8 TODO
+ * @param[in] send8_data TODO
  * @param[in] data TODO
  */
-void sh1106_write_display_data(t_send8 send8, uint8_t data);
+void sh1106_write_display_data(const sh1106_send8_data_t send8_data, uint8_t data);
 
 /**
  * @brief Read Status.
