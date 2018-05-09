@@ -1,6 +1,28 @@
+[![Build Status](https://travis-ci.org/yet-another-gauge/sh1106.svg?branch=master)](https://travis-ci.org/yet-another-gauge/sh1106)
+
 # Datasheets and user manuals
 
 * [SH1106, 132 X 64 Dot Matrix OLED/PLED, Segment/Common Driver with Controller](https://www.waveshare.com/w/upload/5/5e/SH1106.pdf)
+
+# Getting started
+
+### CMake
+
+```cmake
+# CMakeLists.txt
+
+...
+add_executable(<target>
+  $<TARGET_OBJECTS:sh1106>
+  ...)
+  
+...
+target_include_directories(<target> PUBLIC
+        $<TARGET_PROPERTY:sh1106,INTERFACE_INCLUDE_DIRECTORIES>
+        ...)
+
+...
+```
 
 # API
 
@@ -109,25 +131,41 @@ void sh1106_set_common_pads_hardware_configuration(t_send8 send8, enum sh1106_co
 ### [Set VCOM deselect level](https://github.com/yet-another-gauge/sh1106/wiki/API#set-vcom-deselect-level) 
 This command is to set the common pad output voltage level at deselect stage.
 
-  | deselect_level | β       | deselect_level | β           | deselect_level | β           | deselect_level | β           |
-  | :------------: | :-----: | :------------: | :---------: | :------------: | :---------: | :------------: | :---------: |
-  | 0x00           | 0.430   | 0x10           |             | 0x20           |             | 0x30           |             |
-  | 0x01           |         | 0x11           |             | 0x21           |             | 0x31           |             |
-  | 0x02           |         | 0x12           |             | 0x22           |             | 0x32           |             |
-  | 0x03           |         | 0x13           |             | 0x23           |             | 0x33           |             |
-  | 0x04           |         | 0x14           |             | 0x24           |             | 0x34           |             |
-  | 0x05           |         | 0x15           |             | 0x25           |             | 0x35           | 0.770 (POR) |
-  | 0x06           |         | 0x16           |             | 0x26           |             | 0x36           |             |
-  | 0x07           |         | 0x17           |             | 0x27           |             | 0x37           |             |
-  | 0x08           |         | 0x18           |             | 0x28           |             | 0x38           |             |
-  | 0x09           |         | 0x19           |             | 0x29           |             | 0x39           |             |
-  | 0x0A           |         | 0x1A           |             | 0x2A           |             | 0x3A           |             |
-  | 0x0B           |         | 0x1B           |             | 0x2B           |             | 0x3B           |             |
-  | 0x0C           |         | 0x1C           |             | 0x2C           |             | 0x3C           |             |
-  | 0x0D           |         | 0x1D           |             | 0x2D           |             | 0x3D           |             |
-  | 0x0E           |         | 0x1E           |             | 0x2E           |             | 0x3E           |             |
-  | 0x0F           |         | 0x1F           |             | 0x2F           |             | 0x3F           |             |
-  |                |         |                |             |                |             | 0x40 - 0xFF    | 1           |
+  | deselect_level | β       | deselect_level | β       |
+  | :------------: | :-----: | :------------: | :-----: |
+  | 0x00           | 0.430   | 0x20           | 0.63528 |
+  | 0x01           | 0.43642 | 0x21           | 0.6417  |
+  | 0x02           | 0.44283 | 0x22           | 0.64811 |
+  | 0x03           | 0.44925 | 0x23           | 0.65453 |
+  | 0x04           | 0.45566 | 0x24           | 0.66094 |
+  | 0x05           | 0.46208 | 0x25           | 0.66735 |
+  | 0x06           | 0.46849 | 0x26           | 0.67377 |
+  | 0x07           | 0.47491 | 0x27           | 0.68019 |
+  | 0x08           | 0.48132 | 0x28           | 0.6866  |
+  | 0x09           | 0.48774 | 0x29           | 0.69302 |
+  | 0x0A           | 0.49415 | 0x2A           | 0.69943 |
+  | 0x0B           | 0.50057 | 0x2B           | 0.70585 |
+  | 0x0C           | 0.50698 | 0x2C           | 0.71226 |
+  | 0x0D           | 0.5134  | 0x2D           | 0.71868 |
+  | 0x0E           | 0.51981 | 0x2E           | 0.72509 |
+  | 0x0F           | 0.52623 | 0x2F           | 0.73151 |
+  | 0x10           | 0.53264 | 0x30           | 0.73791 |
+  | 0x11           | 0.53906 | 0x31           | 0.74434 |
+  | 0x12           | 0.54547 | 0x32           | 0.75075 |
+  | 0x13           | 0.55189 | 0x33           | 0.75717 |
+  | 0x14           | 0.5583  | 0x34           | 0.76358 |
+  | 0x15           | 0.56472 | **0x35**       | **0.770 (POR)** |
+  | 0x16           | 0.57113 | 0x36           | 0.77641 |
+  | 0x17           | 0.57755 | 0x37           | 0.78283 |
+  | 0x18           | 0.58396 | 0x38           | 0.78924 |
+  | 0x19           | 0.59038 | 0x39           | 0.79566 |
+  | 0x1A           | 0.59679 | 0x3A           | 0.80207 |
+  | 0x1B           | 0.60321 | 0x3B           | 0.80848 |
+  | 0x1C           | 0.60962 | 0x3C           | 0.8149  |
+  | 0x1D           | 0.61604 | 0x3D           | 0.82132 |
+  | 0x1E           | 0.62245 | 0x3E           | 0.82773 |
+  | 0x1F           | 0.62887 | 0x3F           | 0.83415 |
+  |                |         | 0x40 - 0xFF    | 1       |
 
 ```c
 Vcom = β * Vref = (0.430 + deselect_level * 0.006415) * Vref
