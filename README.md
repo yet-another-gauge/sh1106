@@ -180,7 +180,7 @@ static void sh1106_spi_send8_data(uint8_t data) {
 int main(void) {
   // ...
   
-  sh1106_init(sh1106_spi_send8_cmd);
+  sh1106_init(spi_send8_cmd);
   
   // ...
 }
