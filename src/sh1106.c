@@ -55,7 +55,8 @@ void sh1106_set_contrast_control_register(const sh1106_send8_cmd_t send8_cmd, ui
   (*send8_cmd)(SH1106_CONTRAST_DATA_REGISTER_SET(contrast_step));
 }
 
-void sh1106_set_segment_re_map(const sh1106_send8_cmd_t send8_cmd, enum sh1106_segment_re_map_direction segment_re_map_direction) {
+void sh1106_set_segment_re_map(const sh1106_send8_cmd_t send8_cmd,
+                               enum sh1106_segment_re_map_direction segment_re_map_direction) {
   switch (segment_re_map_direction) {
     case SH1106_SEGMENT_RE_MAP_NORMAL_DIRECTION: {
       (*send8_cmd)(SH1106_SET_SEGMENT_RE_MAP_NORMAL_DIRECTION);
@@ -217,7 +218,9 @@ void sh1106_set_display_clock_divide_ratio_oscillator_frequency(const sh1106_sen
   }
 }
 
-void sh1106_set_dis_charge_pre_charge_period(const sh1106_send8_cmd_t send8_cmd, uint8_t pre_charge_period, uint8_t dis_charge_period) {
+void sh1106_set_dis_charge_pre_charge_period(const sh1106_send8_cmd_t send8_cmd,
+                                             uint8_t pre_charge_period,
+                                             uint8_t dis_charge_period) {
   (*send8_cmd)(SH1106_PRE_CHARGE_PERIOD_MODE_SET);
   (*send8_cmd)(SH1106_DIS_CHARGE_PRE_CHARGE_PERIOD_DATA_SET(pre_charge_period, dis_charge_period));
 }
